@@ -30,10 +30,6 @@ export {
 		["file_name"] = "Intel::FILE_NAME",	# File name. Typically with protocols with definite indications of a file name.
 	};
 
-    redef record Intel::Info += {
-        meta: string &log &optional;
-    };
-
     # Including a custom configuration file for threat hunting.
     redef Config::config_files += { "/usr/local/zeek/share/zeek/site/threat-hunting/threathunting.dat" };
 }
@@ -54,17 +50,17 @@ export {
 @endif
 
 # Hook for filtering Intel log entries based on predefined criteria.
-hook Intel::log_policy(rec: Intel::Info, id: Log::ID, filter: Log::Filter) &priority=10
+hook Intel::seen_policy(s: Intel::Seen, found: bool) &priority=10
 {
     # Skip processing if threat hunting is disabled.
     if ( ! enable )
         break;
 
-    if (filter$name == "default") {
-        # Check if the current log entry matches the set investigation criteria.
-        if ("HTTP" in rec$seen$conn$service) {
-            rec$seen$conn$http$threathunting = T;
-            rec$meta = to_json(rec$seen$conn$http);
-        }
-    }    
+    # Break if there is no match.
+    if ( ! found )
+        break;
+    
+    # Check if the current log entry matches the set investigation criteria.
+    if ("HTTP" in s$conn$service)
+        s$conn$http$threathunting = T;   
 }

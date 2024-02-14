@@ -2,7 +2,6 @@
 @load frameworks/intel/seen
 @load packages/intel-expire/item-expire
 @load packages/intel-expire/delete-expired
-@load ./http-threathunting
 
 # Loading necessary scripts for intelligence framework and expiration handling.
 module ThreatHunting;
@@ -59,8 +58,11 @@ hook Intel::seen_policy(s: Intel::Seen, found: bool) &priority=10
     # Break if there is no match.
     if ( ! found )
         break;
+
+    # Default Hunting Conn::LOG.
+    s$conn$threathunting = T; 
     
     # Check if the current log entry matches the set investigation criteria.
     if ("HTTP" in s$conn$service)
-        s$conn$http$threathunting = T;   
+        s$conn$http$threathunting = T;
 }

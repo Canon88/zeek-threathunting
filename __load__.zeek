@@ -1,1 +1,2 @@
+@load ./config
 @load ./threathunting

@@ -1,8 +1,25 @@
+@load ../__load__
+
+# Loading necessary scripts for intelligence framework and expiration handling.
+module ThreatHunting;
+
 const EXCLUDE_KEYS: set[string] = {};
 
 redef record HTTP::Info += {
     threathunting: bool &log &optional;
 };
+
+# Hook for filtering Intel log entries based on predefined criteria.
+hook Intel::seen_policy(s: Intel::Seen, found: bool)
+{
+    # Break if there is no match.
+    if ( ! found )
+        break;
+    
+    # Check if the current log entry matches the set investigation criteria.
+    if ( ("HTTP" in enable_module) && (s$conn?$http) )
+        s$conn$http$threathunting = T;
+}
 
 hook HTTP::log_policy(rec: HTTP::Info, id: Log::ID, filter: Log::Filter)
 {

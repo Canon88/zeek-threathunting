@@ -1,1 +1,1 @@
-ThreatHunting::enable_module CONN,HTTP,DNS
+ThreatHunting::enable_module CONN,HTTP,DNS,SSH

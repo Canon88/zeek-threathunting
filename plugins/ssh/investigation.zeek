@@ -4,9 +4,7 @@
 # Loading necessary scripts for intelligence framework and expiration handling.
 module ThreatHunting;
 
-const EXCLUDE_KEYS: set[string] = {};
-
-redef record HTTP::Info += {
+redef record SSH::Info += {
     threathunting: bool &log &optional;
 };
 
@@ -16,15 +14,15 @@ hook Intel::seen_policy(s: Intel::Seen, found: bool)
     # Break if there is no match.
     if ( ! found )
         break;
-    
+
     # Check if the current log entry matches the set investigation criteria.
-    if ( ("HTTP" in enable_module) && (s$conn?$http) )
-        s$conn$http$threathunting = T;
+    if ( ("SSH" in enable_module) && (s$conn?$ssh) )
+        s$conn$ssh$threathunting = T;
 }
 
-hook HTTP::log_policy(rec: HTTP::Info, id: Log::ID, filter: Log::Filter)
+hook SSH::log_policy(rec: SSH::Info, id: Log::ID, filter: Log::Filter)
 {
-    if ( filter$name == "http_investigation" ) {
+    if ( filter$name == "ssh_investigation" ) {
         if (! rec?$threathunting) {
             break;
         }
@@ -33,13 +31,12 @@ hook HTTP::log_policy(rec: HTTP::Info, id: Log::ID, filter: Log::Filter)
 
 event zeek_init()
 {
-    ## Define a new log filter tailored for HTTP investigations.
+    ## Define a new log filter tailored for SSH investigations.
     local filter: Log::Filter = [
-        $name="http_investigation", 
-        $path="http-investigation", 
-        $exclude=EXCLUDE_KEYS
+        $name="ssh_investigation",
+        $path="ssh-investigation"
     ];
 
-    ## Incorporate the defined filter into the standard HTTP log stream.
-    Log::add_filter(HTTP::LOG, filter);
+    ## Incorporate the defined filter into the standard SSH log stream.
+    Log::add_filter(SSH::LOG, filter);
 }

@@ -27,3 +27,8 @@ export {
     # Including a custom configuration file for threat hunting.
     redef Config::config_files += { "/usr/local/zeek/share/zeek/site/threat-hunting/config.dat" };
 }
+
+@load ./plugins/conn
+@load ./plugins/dns
+@load ./plugins/http
+@load ./plugins/ssh

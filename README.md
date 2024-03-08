@@ -37,6 +37,74 @@ This project aims to implement threat hunting in network traffic using Zeek scri
 
 ![Workflow](Workflow.png)
 
+## Directory Structure
+
+```
+$ tree threat-hunting
+threat-hunting
+├── config.dat
+├── config.zeek
+├── __load__.zeek
+├── main.zeek
+├── plugins
+│   ├── conn
+│   │   ├── investigation.zeek
+│   ├── dns
+│   │   ├── investigation.zeek
+│   ├── http
+│   │   ├── investigation.zeek
+│   │   └── normalized.zeek
+│   └── __load__.zeek
+└── threathunting.js
+```
+
+## Script Structure
+
+![img](https://miro.medium.com/v2/resize:fit:1400/1*rYATlN8PoVtN2K4uK_gKaw.png)
+
+## How to Use
+
+**Let’s get hands-on and write our own plugin!**
+
+Usually, you only need to create an `investigation.zeek` script and edit the contents of `Intel::seen_policy` and `HTTP::log_policy`. If you have a normalization requirement, you can also create a `normalized.zeek` to implement normalization. Here is an example of creating `./plugins/http/investigation.zeek`:
+
+- First, add a `threathunting` field of type `bool` to the logs you need. Here it is `HTTP::Info`.
+
+```
+ redef record HTTP::Info += {
+     threathunting: bool &log &optional;
+ };
+```
+
+- Then, use Intel::seen_policy to set threathunting field to True when matching intelligence. Here, remember to add ThreatHunting::enable_module HTTP to config.dat. It will be used to control the hot start and stop of the plugin.
+
+```
+ # Hook for filtering Intel log entries based on predefined criteria.
+ hook Intel::seen_policy(s: Intel::Seen, found: bool)
+ {
+     # Break if there is no match.
+     if ( ! found )
+         break;
+
+     # Check if the current log entry matches the set investigation criteria.
+     if ( ("HTTP" in enable_module) && (s$conn?$http) )
+         s$conn$http$threathunting = T;
+ }
+```
+
+- Finally, use HTTP::log_policy to capture logs when threathunting field is True. Done! Isn’t it simple?
+
+```
+hook HTTP::log_policy(rec: HTTP::Info, id: Log::ID, filter: Log::Filter)
+ {
+     if ( filter$name == "http_investigation" ) {
+         if (! rec?$threathunting) {
+             break;
+         }
+     }
+ }
+```
+
 ## Demo
 
 ![threathunting](threathunting.gif)

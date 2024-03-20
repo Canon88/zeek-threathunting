@@ -1,4 +1,5 @@
 @load ../__load__
+@load ./seen
 
 # Loading necessary scripts for intelligence framework and expiration handling.
 module ThreatHunting;

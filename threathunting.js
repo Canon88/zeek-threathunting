@@ -91,7 +91,7 @@ function handleMessage(message) {
 
     const source = valueObject.meta.source; // Extracting the meta_source
     const desc = valueObject.meta.desc; // Extracting the meta_desc
-    const expire = valueObject.meta.expire; // Extracting the meta_expire
+    const expire = Number(valueObject.meta.expire); // Extracting the meta_expire
 
     let intel_item = {
       indicator: indicator,                 // Using the source IP as the indicator

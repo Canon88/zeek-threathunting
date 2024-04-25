@@ -22,10 +22,13 @@ event zeek_init()
         ["request_headers"] = "http.request.headers",
         ["request_body"] = "http.request.body.content",
         ["request_body_len"] = "http.request.body.bytes",
+        ["request_body_hash"] = "http.request.body.hash",
 
         ["response_headers"] = "http.response.headers",
         ["response_body"] = "http.response.body.content",
         ["response_body_len"] = "http.response.body.bytes",
+        ["response_body_hash"] = "http.response.body.hash",
+        
     );
     Log::add_filter(HTTP::LOG, http_f);
 }

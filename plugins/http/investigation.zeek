@@ -13,12 +13,8 @@ redef record HTTP::Info += {
 # Hook for filtering Intel log entries based on predefined criteria.
 hook Intel::seen_policy(s: Intel::Seen, found: bool)
 {
-    # Break if there is no match.
-    if ( ! found )
-        break;
-    
     # Check if the current log entry matches the set investigation criteria.
-    if ( ("HTTP" in enable_module) && (s$conn?$http) )
+    if ( (found) && ("HTTP" in enable_module) && (s$conn?$http) )
         s$conn$http$threathunting = T;
 }
 
@@ -26,7 +22,7 @@ hook HTTP::log_policy(rec: HTTP::Info, id: Log::ID, filter: Log::Filter)
 {
     if ( filter$name == "http_investigation" ) {
         if (! rec?$threathunting) {
-            break;
+            return;
         }
     }
 }

@@ -11,12 +11,8 @@ redef record connection += {
 # Hook for filtering Intel log entries based on predefined criteria.
 hook Intel::seen_policy(s: Intel::Seen, found: bool)
 {
-    # Break if there is no match.
-    if ( ! found )
-        break;
-
     # Default, the ThreatHunting field is added to the connection.
-    if ( "CONN" in enable_module )
+    if ( (found) && ("CONN" in enable_module) )
         s$conn$threathunting = T;
 }
 
@@ -28,7 +24,7 @@ hook Conn::log_policy(rec: Conn::Info, id: Log::ID, filter: Log::Filter)
 {
     if ( filter$name == "conn_investigation" ) {
         if (! rec?$threathunting) {
-            break;
+            return;
         }
     }
 }

@@ -92,6 +92,7 @@ function handleMessage(message) {
     const source = valueObject.meta.source; // Extracting the meta_source
     const desc = valueObject.meta.desc; // Extracting the meta_desc
     const expire = Number(valueObject.meta.expire); // Extracting the meta_expire
+    const level = valueObject.meta.level; // Extracting the meta_level
 
     let intel_item = {
       indicator: indicator,                 // Using the source IP as the indicator
@@ -100,6 +101,7 @@ function handleMessage(message) {
         source: source,
         desc: desc,
         expire: expire,
+        level: level,
       },     // Adding metadata to the intelligence item
     };
 
